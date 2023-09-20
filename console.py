@@ -113,62 +113,21 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-         """Create an object of any class with given parameters"""
-        if not arg:
+     def do_create(self, args):
+        """ Create an object of any class"""
+        args = args.split()
+        if not args[0]:
             print("** class name missing **")
             return
-
-        """Split the argument into class name and parameters"""
-        args = arg.split()
-
-        """Extract the class name and check if it exists"""
-        class_name = args[0]
-        if class_name not in HBNBCommand.classes:
+        elif args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        """Create a dictionary to store the attributes"""
-        attributes = {}
-
-        """Iterate through the remaining arguments (parameters)"""
-        for param in args[1:]:
-            """Split the parameter into key and value using '=' as a separator"""
-            parts = param.split('=')
-
-            if len(parts) == 2:
-                key, value = parts[0], parts[1]
-
-                """Process the value based on its syntax"""
-                if value.startswith('"') and value.endswith('"'):
-                    """String: Remove double quotes and replace underscores with spaces"""
-                    value = value[1:-1].replace('_', ' ')
-                elif '.' in value:
-                    """Float"""
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        """Invalid float format, skip this parameter"""
-                        print(f"Skipping invalid parameter: {param}")
-                        continue
-                else:
-                    """Integer (default case)"""
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        """invalid integer format, skip this parameter"""
-                        print(f"Skipping invalid parameter: {param}")
-                        continue
-
-                """Add the key-value pair to the attributes dictionary"""
-                attributes[key] = value
-
-        """Create an instance of the class with the provided attributes"""
-        new_instance = HBNBCommand.classes[class_name](**attributes)
-
-        """Save the new instance and print its ID"""
-        new_instance.save()
+        # creating a dict from args
+        new_dict = self._create_dict_instance(args[1:])
+        # sending args on form of kwargs
+        new_instance = HBNBCommand.classes[args[0]](**new_dict)
         print(new_instance.id)
+        new_instance.save()
 
     def help_create(self):
         """ Help information for the create method """
