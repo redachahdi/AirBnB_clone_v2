@@ -3,21 +3,22 @@
 
 from datetime import datetime
 from fabric.api import local
+import os.path
 
 def do_pack():
     '''Creates a .tgz archive from the content of the web_static'''
-
-    '''create the versions folder if it does not exist'''
-    local ("mkdir -p versions")
-
     '''create the file and datetime'''
-    date = datetime.now().strftime("%Y%M%D%H%M%S")
-    file = "versions/web_static_{}.tgz".format(date)
-
-    """create .tgz archive"""
-    result = local("tar -czvf {} web_static".format(file))
-
-    if result.succeeded:
-        return file
-    else:
+    date = datetime.utcnow()
+    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(date.year,
+                                                         date.month,
+                                                         date.day,
+                                                         date.hour,
+                                                         date.minute,
+                                                         date.second)
+    '''Return the .tgz archive'''
+    if os.path.isdir("versions") is False:
+        if local("mkdir -p versions").failed is True:
+            return None
+    if local("tar -cvzf {} web_static".format(file)).failed is True:
         return None
+    return file
